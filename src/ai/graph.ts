@@ -5,7 +5,6 @@ import { START, END } from "@langchain/langgraph";
 import { ChatPromptTemplate, MessagesPlaceholder } from "@langchain/core/prompts";
 import { ChatGroq } from "@langchain/groq";
 import { systemPrompt } from "./contractTemplate";
-import { ChatOpenAI } from "@langchain/openai";
 import { fetchboxPrompt } from "./fetchbox"
 import { contractsArray } from "@/lib/contractCompile";
 import fs from 'fs/promises';
@@ -13,15 +12,10 @@ import path from 'path';
 
 
 
-const KEY = "sk-proj-73353444-0000-0000-0000-000000000000";
-const model = new ChatOpenAI({
-    modelName: "phi",
+const model = new ChatGroq({
+    modelName: "llama-3.3-70b-versatile",
     temperature: 0.7,
-    maxTokens: 18192,
-    apiKey: KEY,
-    configuration: {
-        baseURL: "https://phi.us.gaianet.network/v1",
-    },
+    apiKey: process.env.NEXT_PUBLIC_GROQ_API_KEY,
 });
 
 type guildState = {
@@ -94,7 +88,7 @@ Respond strictly with ONLY ONE of these words: "contribute_node", "escrow_Node",
                 new MessagesPlaceholder({ variableName: "chat_history", optional: true }),
                 ["human", "{input}"]
             ]);
-            const summaryModel = model.withConfig({ runName: "Summarizer" });
+            const summaryModel = model;
             const conversationalResponse = await conversationalPrompt.pipe(summaryModel).invoke({ input: state.input, chat_history: state.chatHistory });
 
             return { result: conversationalResponse.content as string, messages: [conversationalResponse.content] };
@@ -208,11 +202,7 @@ Respond strictly with ONLY ONE of these words: "contribute_node", "escrow_Node",
         ]);
 
         try {
-            const response = await escrowPrompt.pipe(new ChatGroq({
-                modelName: "llama3-8b-8192",
-                temperature: 0.9,
-                apiKey: process.env.NEXT_PUBLIC_GROQ_API_KEY,
-            })).invoke({ 
+            const response = await escrowPrompt.pipe(model).invoke({ 
                 input: state.input, 
                 chat_history: state.chatHistory,
                 context: context

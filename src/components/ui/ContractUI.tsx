@@ -92,11 +92,10 @@ export function SmartContractDisplay({ contractCode }: { contractCode: string })
 
   const useHandleDeploy = async () => {
     setIsLoading(true)
-    const hashaddress = await useDeployContract({ sourceCode: contractCode })
+    const result = await useDeployContract({ sourceCode: contractCode })
 
-    if (hashaddress) {
-      //@ts-ignore
-      setDeployedAddress(hashaddress)
+    if (result && result.contractAddress) {
+      setDeployedAddress(result.contractAddress)
       setShowCode(false)
       setIsDeployed(true)
     }

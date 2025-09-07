@@ -8,7 +8,7 @@ import {
   import { defaultWagmiConfig } from '@web3modal/wagmi/react/config';
   import { getCsrfToken, getSession, signIn, signOut } from 'next-auth/react';
   import { cookieStorage, createStorage } from 'wagmi';
-  import { baseSepolia} from 'wagmi/chains';
+  import { arbitrumSepolia} from 'wagmi/chains';
   import { createPublicClient,http } from 'viem';
 
   // Get projectId from https://cloud.walletconnect.com
@@ -24,11 +24,11 @@ import {
   };
   
   export const publicClient = createPublicClient({
-    chain: baseSepolia,
+    chain: arbitrumSepolia,
     transport: http()
   });
   // Create wagmiConfig
-  const chains = [baseSepolia] as const;
+  const chains = [arbitrumSepolia] as const;
   export const config = defaultWagmiConfig({
     chains,
     projectId,
@@ -45,7 +45,7 @@ import {
     getMessageParams: async () => ({
       domain: typeof window !== 'undefined' ? window.location.host : '',
       uri: typeof window !== 'undefined' ? window.location.origin : '',
-      chains: [baseSepolia.id],
+      chains: [arbitrumSepolia.id],
       statement: 'Please sign with your account',
     }),
     createMessage: ({ address, ...args }: SIWECreateMessageArgs) =>
